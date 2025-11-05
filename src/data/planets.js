@@ -18,7 +18,8 @@ export const planets = [
     },
     sidePlanets: ['orionis', 'lumenara'],
     orbitingPlanets: ['orionis', 'lumenara', 'theronix', 'phaeronix'],
-    moons: 7
+    moons: 12,
+    moonsWithSatellites: 3
   },
   {
     id: 'lumenara',
@@ -38,7 +39,8 @@ export const planets = [
     },
     sidePlanets: ['etheron', 'theronix'],
     orbitingPlanets: ['etheron', 'theronix', 'phaeronix', 'orionis'],
-    moons: 5
+    moons: 10,
+    moonsWithSatellites: 2
   },
   {
     id: 'theronix',
@@ -58,7 +60,8 @@ export const planets = [
     },
     sidePlanets: ['lumenida', 'orionis'],
     orbitingPlanets: ['lumenida', 'orionis', 'etheron', 'lumenara'],
-    moons: 6
+    moons: 14,
+    moonsWithSatellites: 4
   },
   {
     id: 'orionis',
@@ -78,7 +81,8 @@ export const planets = [
     },
     sidePlanets: ['theronix', 'etheron'],
     orbitingPlanets: ['theronix', 'etheron', 'lumenara', 'phaeronix'],
-    moons: 4
+    moons: 8,
+    moonsWithSatellites: 2
   },
   {
     id: 'lumenida',
@@ -98,7 +102,8 @@ export const planets = [
     },
     sidePlanets: ['theronix', 'orionis'],
     orbitingPlanets: ['theronix', 'orionis', 'etheron', 'lumenara'],
-    moons: 5
+    moons: 11,
+    moonsWithSatellites: 3
   },
   {
     id: 'phaeronix',
@@ -118,6 +123,7 @@ export const planets = [
     },
     sidePlanets: ['lumenara', 'etheron'],
     orbitingPlanets: ['lumenara', 'etheron', 'theronix', 'orionis'],
-    moons: 6
+    moons: 13,
+    moonsWithSatellites: 3
   }
 ];

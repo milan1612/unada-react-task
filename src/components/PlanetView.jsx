@@ -15,6 +15,7 @@ export default function PlanetView({ planet, allPlanets, onPlanetClick }) {
 
   // Get moons count
   const moonsCount = planet.moons || 0;
+  const moonsWithSatellites = planet.moonsWithSatellites || 0;
 
   // Angles for orbiting planets (spread around the circle)
   const orbitAngles = orbitingPlanets.map((_, idx) => {
@@ -22,13 +23,14 @@ export default function PlanetView({ planet, allPlanets, onPlanetClick }) {
     return (360 / total) * idx;
   });
 
-  // Generate moon positions
+  // Generate moon positions with more variety
   const generateMoons = (count) => {
     return Array.from({ length: count }, (_, i) => ({
       id: `moon-${i}`,
       angle: (360 / count) * i,
-      orbitRadius: 25 + (i % 3) * 6,
-      size: 4 + (i % 3) * 2,
+      orbitRadius: 20 + (i % 5) * 5, // More varied orbits
+      size: 3 + (i % 4) * 2, // More size variety
+      hasSatellites: i < moonsWithSatellites, // Some moons have satellites
     }));
   };
 
@@ -44,7 +46,7 @@ export default function PlanetView({ planet, allPlanets, onPlanetClick }) {
     <div className="planet-view-container">
       {/* Central Planet Container */}
       <div className="planet-orbit-container">
-        {/* Orbital Rings SVG - Half Circles */}
+        {/* Orbital Rings SVG - Half Circles (Upper Only) */}
         <svg
           className="orbit-svg"
           style={{
@@ -59,61 +61,44 @@ export default function PlanetView({ planet, allPlanets, onPlanetClick }) {
           preserveAspectRatio="xMidYMid meet"
           viewBox="0 0 100 100"
         >
-          {/* Outer rings for planets - Top half only (upper arc) */}
-          {[1, 2, 3, 4, 5, 6].map((ring, idx) => {
+          {/* Full orbit rings around planets - Complete circles */}
+          {/* Outer rings for planets - Full circles */}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((ring, idx) => {
             const radius = 25 + idx * 6;
             const cx = 50;
             const cy = 50;
-            // Top half arc: from 180° (left) to 0° (right) going through 270° (top)
-            // In SVG: 0°=right, 90°=bottom, 180°=left, 270°=top
-            // For upper arc: start at left (180°), end at right (0°), go counter-clockwise through top (270°)
-            const startAngle = 180; // Left point
-            const endAngle = 0;     // Right point
-            const startX = cx + radius * Math.cos((startAngle * Math.PI) / 180);
-            const startY = cy + radius * Math.sin((startAngle * Math.PI) / 180);
-            const endX = cx + radius * Math.cos((endAngle * Math.PI) / 180);
-            const endY = cy + radius * Math.sin((endAngle * Math.PI) / 180);
-            // largeArcFlag: 0 for arc <= 180° (top half), 1 for arc > 180° (bottom half)
-            // sweepFlag: 0 = counter-clockwise (goes through top), 1 = clockwise (goes through bottom)
-            const largeArcFlag = "0"; // Small arc (top half)
-            const sweepFlag = "0";    // Counter-clockwise (through top)
             
             return (
-              <path
+              <circle
                 key={`ring-${idx}`}
-                d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${endX} ${endY}`}
+                cx={cx}
+                cy={cy}
+                r={radius}
                 fill="none"
-                stroke="rgba(255, 255, 255, 0.3)"
-                strokeWidth="0.15"
-                strokeDasharray={idx % 2 === 0 ? "0.4 0.2" : "none"}
-                opacity="0.7"
+                stroke="rgba(255, 255, 255, 0.5)"
+                strokeWidth="0.25"
+                strokeDasharray={idx % 2 === 0 ? "0.6 0.4" : "none"}
+                opacity="0.9"
               />
             );
           })}
-          {/* Inner rings for moons - Top half only */}
-          {[1, 2, 3].map((ring, idx) => {
+          {/* Inner rings for moons - Full circles */}
+          {[1, 2, 3, 4, 5, 6].map((ring, idx) => {
             const radius = 20 + idx * 4;
             const cx = 50;
             const cy = 50;
-            // Top half arc: from 180° (left) to 0° (right) going through 270° (top)
-            const startAngle = 180; // Left point
-            const endAngle = 0;     // Right point
-            const startX = cx + radius * Math.cos((startAngle * Math.PI) / 180);
-            const startY = cy + radius * Math.sin((startAngle * Math.PI) / 180);
-            const endX = cx + radius * Math.cos((endAngle * Math.PI) / 180);
-            const endY = cy + radius * Math.sin((endAngle * Math.PI) / 180);
-            const largeArcFlag = "0"; // Small arc (top half)
-            const sweepFlag = "0";    // Counter-clockwise (through top)
             
             return (
-              <path
+              <circle
                 key={`moon-ring-${idx}`}
-                d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${endX} ${endY}`}
+                cx={cx}
+                cy={cy}
+                r={radius}
                 fill="none"
-                stroke="rgba(150, 150, 255, 0.3)"
-                strokeWidth="0.1"
-                strokeDasharray="0.2 0.2"
-                opacity="0.5"
+                stroke="rgba(150, 150, 255, 0.5)"
+                strokeWidth="0.2"
+                strokeDasharray="0.4 0.4"
+                opacity="0.7"
               />
             );
           })}
@@ -134,40 +119,98 @@ export default function PlanetView({ planet, allPlanets, onPlanetClick }) {
           />
         </div>
 
-        {/* Moons - positioned along top half orbital rings only */}
+        {/* Moons - positioned along full orbital rings */}
         {moons.map((moon) => {
-          // Position moons along the top half of the orbit (upper arc only)
-          // Map angles to top half: 180° to 360° (or 0°), which gives negative y (above center)
-          // Convert 0-360° to 180°-360° for top half
-          const topHalfAngle = 180 + (moon.angle % 180); // Map to 180°-360° range
-          const rad = (topHalfAngle * Math.PI) / 180;
+          // Position moons along full orbit (all around the planet)
+          const rad = (moon.angle * Math.PI) / 180;
           const x = Math.cos(rad) * moon.orbitRadius;
-          const y = Math.sin(rad) * moon.orbitRadius; // Will be negative for top half
+          const y = Math.sin(rad) * moon.orbitRadius;
+
+          // Generate satellites around this moon if it has them
+          const satelliteCount = moon.hasSatellites ? 2 + (moon.id.match(/\d+/)?.[0] % 3) : 0;
 
           return (
-            <div
-              key={moon.id}
-              className="moon"
-              style={{
-                width: `${moon.size}px`,
-                height: `${moon.size}px`,
-                transform: `translate(calc(${x}% - 50%), calc(${y}% - 50%))`,
-              }}
-            />
+            <div key={moon.id}>
+              {/* Main Moon */}
+              <div
+                className="moon"
+                style={{
+                  width: `${moon.size}px`,
+                  height: `${moon.size}px`,
+                  transform: `translate(calc(${x}% - 50%), calc(${y}% - 50%))`,
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  zIndex: 5,
+                }}
+              />
+              
+              {/* Satellites around moon (moons around moons) */}
+              {moon.hasSatellites && Array.from({ length: satelliteCount }).map((_, satIdx) => {
+                const satAngle = (360 / satelliteCount) * satIdx;
+                const satRad = (satAngle * Math.PI) / 180;
+                const satRadius = 2; // Small orbit radius around moon
+                const satX = Math.cos(satRad) * satRadius;
+                const satY = Math.sin(satRad) * satRadius;
+                const satSize = 1.5; // Very small satellites
+
+                return (
+                  <div
+                    key={`sat-${moon.id}-${satIdx}`}
+                    className="moon-satellite"
+                    style={{
+                      width: `${satSize}px`,
+                      height: `${satSize}px`,
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: `translate(calc(${x}% + ${satX}% - 50%), calc(${y}% + ${satY}% - 50%))`,
+                      zIndex: 4,
+                    }}
+                  />
+                );
+              })}
+
+              {/* Orbit ring around moon with satellites */}
+              {moon.hasSatellites && (
+                <svg
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    width: '4%',
+                    height: '4%',
+                    transform: `translate(calc(${x}% - 2%), calc(${y}% - 2%))`,
+                    zIndex: 3,
+                    overflow: 'visible',
+                  }}
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="rgba(150, 150, 255, 0.2)"
+                    strokeWidth="0.5"
+                    strokeDasharray="1 1"
+                    opacity="0.4"
+                  />
+                </svg>
+              )}
+            </div>
           );
         })}
 
-        {/* Orbiting Planets - positioned along top half arc only (upper) */}
+        {/* Orbiting Planets - positioned along full orbit */}
         {orbitingPlanets.map((orbitingPlanet, idx) => {
           if (!orbitingPlanet) return null;
-          // Position along top half only (upper arc): map to 180°-360° range
-          // This ensures planets appear above the center (negative y values)
-          const baseAngle = orbitAngles[idx] % 180;
-          const topHalfAngle = 180 + baseAngle; // Map to 180°-360° for top half
+          // Position along full orbit (all around the planet)
+          const angle = orbitAngles[idx];
           const radius = 25 + (idx % 4) * 6;
-          const rad = (topHalfAngle * Math.PI) / 180;
+          const rad = (angle * Math.PI) / 180;
           const x = Math.cos(rad) * radius;
-          const y = Math.sin(rad) * radius; // Will be negative for top half
+          const y = Math.sin(rad) * radius;
 
           return (
             <button
